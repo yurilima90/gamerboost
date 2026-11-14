@@ -1,0 +1,37 @@
+name: Release
+
+# Ao criar uma tag como v3.3.0, compila o EXE e publica em Releases.
+# O programa usa essa página para se atualizar sozinho.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verificar e testar
+        run: |
+          GOOS=windows GOARCH=amd64 go vet .
+          go test -run 'TestIsNewer|TestFetchAndDownload' .
+      - name: Compilar
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath \
+            -ldflags="-s -w -H=windowsgui -X main.version=${VERSION}" -o GamerBoost.exe .
+          sha256sum GamerBoost.exe > GamerBoost.exe.sha256
+          cat GamerBoost.exe.sha256
+      - name: Publicar release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" GamerBoost.exe GamerBoost.exe.sha256 \
+            --title "GamerBoost $GITHUB_REF_NAME" \
+            --generate-notes

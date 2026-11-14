@@ -1,0 +1,4 @@
+*.exe
+*.exe.sha256
+*.exe.old
+*.exe.new

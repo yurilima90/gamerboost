@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GamerBoost – Otimizador Ryzen 5 1600 + RX 580</title>
+<style>
+:root{
+  --bg:#0b0d12;--bg2:#12151c;--card:#171b24;--card2:#1d222d;--line:#262c39;
+  --tx:#e8ebf2;--mut:#8b93a7;--acc:#ff3d3d;--acc2:#ff8a1f;--ok:#2fd27a;--warn:#ffc233;--bad:#ff5c6c;
+  --grad:linear-gradient(135deg,#ff3d3d,#ff8a1f);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:radial-gradient(1200px 600px at 80% -10%,#2a1216 0,transparent 60%),var(--bg);color:var(--tx);
+  font:14px/1.45 "Segoe UI",system-ui,sans-serif;display:flex;overflow:hidden;user-select:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+input[type=text]{font:inherit;color:var(--tx)}
+::-webkit-scrollbar{width:10px}::-webkit-scrollbar-thumb{background:#2b3140;border-radius:8px}
+/* sidebar */
+aside{width:218px;background:var(--bg2);border-right:1px solid var(--line);padding:18px 12px;display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+.logo{display:flex;align-items:center;gap:10px;padding:4px 8px 16px}
+.logo i{width:36px;height:36px;border-radius:10px;background:var(--grad);display:grid;place-items:center;font-style:normal;font-weight:800;font-size:18px;box-shadow:0 6px 22px #ff3d3d55}
+.logo b{font-size:17px;letter-spacing:.3px}.logo small{display:block;color:var(--mut);font-size:11px}
+.nav{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--mut);text-align:left;width:100%;transition:.15s}
+.nav:hover{background:var(--card);color:var(--tx)}
+.nav.on{background:linear-gradient(90deg,#ff3d3d26,transparent);color:var(--tx);box-shadow:inset 3px 0 0 var(--acc)}
+.nav span{width:20px;text-align:center}
+.side-foot{margin-top:auto;font-size:11px;color:var(--mut);padding:8px}
+/* main */
+main{flex:1;overflow:auto;padding:26px 30px 40px}
+h1{font-size:24px;margin-bottom:4px}.sub{color:var(--mut);margin-bottom:20px}
+section{display:none;animation:in .25s}section.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:980px){.g3,.g4{grid-template-columns:repeat(2,1fr)}}
+.btn{padding:10px 16px;border-radius:10px;background:var(--card2);border:1px solid var(--line);transition:.15s;font-weight:600}
+.btn:hover{border-color:#3a4256;background:#232938}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.pri{background:var(--grad);border:0;color:#fff;box-shadow:0 8px 26px #ff3d3d44}
+.btn.pri:hover{filter:brightness(1.1)}
+.btn.sm{padding:6px 12px;font-size:13px}
+/* hero */
+.hero{padding:28px;border-radius:18px;background:linear-gradient(120deg,#2b1117,#1a1d27 60%);border:1px solid #3a1c22;position:relative;overflow:hidden;margin-bottom:16px}
+.hero:after{content:"";position:absolute;right:-60px;top:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(#ff3d3d55,transparent 70%)}
+.hero h2{font-size:26px;margin-bottom:6px}.hero p{color:#c3c8d6;max-width:560px;margin-bottom:18px}
+.big{padding:15px 30px;font-size:17px;border-radius:14px}
+.chk{display:flex;gap:8px;align-items:center;margin-top:14px;color:#c3c8d6;font-size:13px}
+.chk input{accent-color:var(--acc);width:16px;height:16px}
+.stat b{display:block;font-size:26px}.stat span{color:var(--mut);font-size:12px}
+/* tweaks */
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.bar input[type=text]{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-width:220px;user-select:text}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.chip{padding:6px 12px;border-radius:99px;background:var(--card);border:1px solid var(--line);color:var(--mut);font-size:12.5px}
+.chip.on{background:#ff3d3d22;border-color:var(--acc);color:#fff}
+.cat{margin:18px 0 8px;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:var(--acc2);font-weight:700}
+.tw{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;margin-bottom:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;transition:.15s}
+.tw:hover{border-color:#39415a}
+.tw.sel{border-color:var(--acc);background:#1f1a22}
+.tw input{accent-color:var(--acc);width:17px;height:17px;margin-top:3px;flex-shrink:0}
+.tw .t{flex:1;min-width:0}.tw .n{font-weight:600}.tw .d{color:var(--mut);font-size:12.5px;margin-top:2px}
+.tag{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:1px;font-weight:700;letter-spacing:.3px}
+.tag.seguro{background:#2fd27a22;color:var(--ok)}.tag.moderado{background:#ffc23322;color:var(--warn)}
+.tag.rb{background:#6b7bff22;color:#9aa6ff}.tag.nr{background:#ff5c6c22;color:var(--bad)}
+.st{font-size:12px;padding:4px 10px;border-radius:99px;background:var(--card2);color:var(--mut);white-space:nowrap;flex-shrink:0}
+.st.ok{background:#2fd27a22;color:var(--ok)}.st.err{background:#ff5c6c22;color:var(--bad)}.st.run{background:#ffc23322;color:var(--warn)}
+/* scanner */
+.sc h3{font-size:12px;letter-spacing:1px;color:var(--acc2);text-transform:uppercase;margin-bottom:8px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px dashed #222838;user-select:text}
+.kv:last-child{border:0}.kv span{color:var(--mut)}.kv b{font-weight:600;text-align:right}
+.rec{display:flex;gap:10px;padding:10px 12px;border-radius:10px;background:var(--card2);margin-bottom:8px;border-left:3px solid var(--warn);user-select:text}
+.rec.good{border-color:var(--ok)}.rec.bad{border-color:var(--bad)}
+/* clean */
+.cl{display:flex;gap:12px;align-items:center;padding:11px 14px;margin-bottom:8px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.cl input{accent-color:var(--acc);width:17px;height:17px}.cl .t{flex:1}.cl .sz{font-weight:700;min-width:90px;text-align:right}
+.bigno{font-size:34px;font-weight:800;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* modal */
+.ov{position:fixed;inset:0;background:#000b;display:none;place-items:center;z-index:9}.ov.on{display:grid}
+.modal{width:min(640px,92vw);background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+.prog{height:10px;background:#0c0e14;border-radius:99px;overflow:hidden;margin:14px 0}
+.prog i{display:block;height:100%;width:0;background:var(--grad);transition:width .25s}
+.log{height:230px;overflow:auto;background:#0c0e14;border-radius:10px;padding:10px;font:12px/1.5 Consolas,monospace;user-select:text}
+.log div.ok{color:var(--ok)}.log div.err{color:var(--bad)}.log div.hd{color:var(--acc2);margin-top:6px}
+ul.tips{padding-left:18px;color:#c3c8d6}ul.tips li{margin:5px 0;user-select:text}
+.note{color:var(--mut);font-size:12.5px;margin-top:10px}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--card2);border:1px solid var(--line);padding:12px 16px;border-radius:12px;display:none;z-index:10;max-width:360px}
+.toast.on{display:block}
+
+/* monitor / benchmark */
+.mon{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.mc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.mc .l{color:var(--mut);font-size:12px;letter-spacing:.8px;text-transform:uppercase}
+.mc .v{font-size:30px;font-weight:800;margin:2px 0 6px}.mc .v small{font-size:13px;color:var(--mut);font-weight:600;margin-left:4px}
+.mc canvas{width:100%;height:46px;display:block}
+.score{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.score .tot{font-size:54px;font-weight:900;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1}
+.sub{color:var(--mut)}
+.steps{margin-top:12px}.steps .s{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed #222838}
+.steps .s b{color:var(--tx)}.steps .s.run b{color:var(--warn)}
+#gpuCv{width:100%;max-width:520px;aspect-ratio:16/9;background:#000;border-radius:10px;display:block}
+table.cmp{width:100%;border-collapse:collapse;user-select:text}
+table.cmp th,table.cmp td{padding:8px 10px;border-bottom:1px solid #222838;text-align:right}
+table.cmp th:first-child,table.cmp td:first-child{text-align:left}
+.up{color:var(--ok);font-weight:700}.dn{color:var(--bad);font-weight:700}.eq{color:var(--mut)}
+select,input.t{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--tx);font:inherit;user-select:text}
+.hist{display:flex;gap:10px;align-items:center;padding:9px 12px;background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:6px}
+.hist .t{flex:1}.hist small{color:var(--mut)}
+</style>
+</head>
+<body>
+<aside>
+  <div class="logo"><i>G</i><div><b>GamerBoost</b><small>Ryzen 5 1600 · RX 580</small></div></div>
+  <button class="nav on" data-p="home"><span>⚡</span>Início</button>
+  <button class="nav" data-p="tweaks"><span>🛠</span>Otimizações</button>
+  <button class="nav" data-p="scan"><span>🖥</span>Scanner do PC</button>
+  <button class="nav" data-p="clean"><span>🧹</span>Limpeza</button>
+  <button class="nav" data-p="monitor"><span>📈</span>Monitor ao vivo</button>
+  <button class="nav" data-p="bench"><span>🏁</span>Benchmark</button>
+  <button class="nav" data-p="restore"><span>🛟</span>Restauração</button>
+  <button class="nav" data-p="tips"><span>💡</span>Dicas BIOS / AMD</button>
+  <div class="side-foot"><span id="ver">v–</span> · <a id="chkUpd" style="color:var(--acc2);cursor:pointer">Verificar atualização</a><br>100% gratuito · funciona offline<br><a id="exit" style="color:var(--acc2);cursor:pointer">Sair do programa</a></div>
+</aside>
+
+<main>
+<div id="updBar" style="display:none;margin-bottom:16px" class="card"><b id="updTxt"></b> <button class="btn pri sm" id="updGo" style="margin-left:10px">Atualizar agora</button></div>
+<!-- INÍCIO -->
+<section id="home" class="on">
+  <div class="hero">
+    <h2>Mais FPS, menos latência. Em um clique.</h2>
+    <p>Cria um ponto de restauração, aplica as otimizações seguras para o seu Ryzen 5 1600 com RX 580, remove bloatware e limpa o sistema.</p>
+    <button class="btn pri big" id="one">⚡ OTIMIZAR AGORA</button>
+    <label class="chk"><input type="checkbox" id="optBloat" checked> Incluir remoção de bloatware (não pode ser desfeita automaticamente; os apps voltam pela Microsoft Store)</label>
+    <label class="chk" style="margin-top:6px"><input type="checkbox" id="optClean" checked> Incluir limpeza do sistema</label>
+  </div>
+  <div class="grid g4" style="margin-bottom:14px">
+    <div class="card stat"><b id="sTotal">–</b><span>ajustes disponíveis</span></div>
+    <div class="card stat"><b id="sApplied">–</b><span>ajustes aplicados</span></div>
+    <div class="card stat"><b id="sSafe">–</b><span>ajustes seguros pendentes</span></div>
+    <div class="card stat"><b id="sAdv">–</b><span>avançados (manual)</span></div>
+  </div>
+  <div class="card">
+    <b>Como funciona</b>
+    <ul class="tips" style="margin-top:8px">
+      <li>O ponto de restauração do Windows é criado <b>antes</b> de qualquer alteração.</li>
+      <li>Cada ajuste guarda o valor original e pode ser revertido individualmente na aba <b>Otimizações</b>.</li>
+      <li>Ajustes marcados como <b>moderado</b> não entram no botão de um clique: você escolhe quais aplicar.</li>
+      <li>Reinicie o PC ao final para ativar os ajustes marcados com <b>REINICIAR</b>.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- OTIMIZAÇÕES -->
+<section id="tweaks">
+  <h1>Otimizações</h1><p class="sub">Cada ajuste tem uma descrição. Marque os que quiser e aplique, ou reverta quando quiser.</p>
+  <div class="bar">
+    <input type="text" id="q" placeholder="Buscar ajuste...">
+    <button class="btn sm" id="selSafe">Marcar seguros</button>
+    <button class="btn sm" id="selNone">Limpar seleção</button>
+    <button class="btn sm pri" id="applySel">Aplicar selecionados</button>
+    <button class="btn sm" id="revSel">Reverter selecionados</button>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div id="twList"></div>
+</section>
+
+<!-- SCANNER -->
+<section id="scan">
+  <h1>Scanner do PC</h1><p class="sub">Especificações reais lidas do seu computador, com recomendações.</p>
+  <div class="bar"><button class="btn pri" id="doScan">🔍 Escanear agora</button><span id="scanMsg" class="note" style="margin:0"></span></div>
+  <div id="scanOut"></div>
+</section>
+
+<!-- LIMPEZA -->
+<section id="clean">
+  <h1>Limpeza do sistema</h1><p class="sub">Remove arquivos temporários, caches e lixo que ocupam disco. Seus jogos, saves e senhas não são tocados.</p>
+  <div class="bar"><button class="btn" id="cScan">🔍 Analisar</button><button class="btn pri" id="cRun" disabled>🧹 Limpar selecionados</button>
+    <span class="note" style="margin:0 0 0 8px">Espaço encontrado:</span><span class="bigno" id="cTotal">0 MB</span></div>
+  <div id="cList"></div>
+</section>
+
+<!-- RESTAURAÇÃO -->
+<section id="restore">
+  <h1>Restauração</h1><p class="sub">Não gostou do resultado? Volte ao estado anterior.</p>
+  <div class="grid g3">
+    <div class="card"><b>1. Criar ponto de restauração</b><p class="note">Salva o estado atual do Windows e um backup do registro. É feito automaticamente no botão “Otimizar agora”.</p><br><button class="btn pri" id="rpCreate">🛟 Criar ponto agora</button></div>
+    <div class="card"><b>2. Reverter todos os ajustes</b><p class="note">Desfaz tudo que o GamerBoost aplicou, devolvendo os valores originais um a um (exceto apps removidos).</p><br><button class="btn" id="revAll">↩ Reverter tudo</button></div>
+    <div class="card"><b>3. Restauração do Windows</b><p class="note">Abre o assistente do Windows para voltar ao ponto de restauração criado (inclui qualquer alteração de sistema).</p><br><button class="btn" id="rpOpen">Abrir Restauração do Sistema</button></div>
+  </div>
+  <p class="note">Observação: a Restauração do Sistema do Windows não reinstala apps da Microsoft Store removidos; reinstale-os pela loja se precisar.</p>
+</section>
+
+<!-- DICAS -->
+<section id="tips">
+  <h1>Dicas para Ryzen 5 1600 + RX 580</h1><p class="sub">Ganhos que nenhum programa consegue fazer sozinho, direto na BIOS e no driver AMD.</p>
+  <div class="grid g2">
+    <div class="card"><b>BIOS (maior ganho no Ryzen 1600)</b>
+      <ul class="tips" style="margin-top:8px">
+        <li>Ative <b>XMP / DOCP</b> e deixe a RAM em 3000–3200 MHz: o Infinity Fabric do Zen 1 depende da frequência da memória.</li>
+        <li>Use <b>2 pentes em dual channel</b> (ex.: 2×8 GB nos slots A2/B2).</li>
+        <li>Atualize a BIOS (AGESA mais recente) para melhor estabilidade com a memória.</li>
+        <li>Ative <b>Resizable BAR/Above 4G</b> só se a BIOS oferecer e o driver aceitar; na RX 580 o ganho é pequeno.</li>
+        <li>Se tiver cooler decente, um OC leve em todos os núcleos (3,7–3,9 GHz) rende mais do que qualquer ajuste de Windows.</li>
+      </ul></div>
+    <div class="card"><b>Driver AMD Adrenalin (RX 580)</b>
+      <ul class="tips" style="margin-top:8px">
+        <li>Ligue <b>Radeon Anti-Lag</b> em jogos competitivos DX11/DX9 para menos input lag.</li>
+        <li>Desligue <b>Radeon Chill</b> e <b>Enhanced Sync</b> se notar travadas.</li>
+        <li>Use <b>FreeSync</b> (se o monitor tiver) com limite de FPS 3 abaixo da taxa do monitor.</li>
+        <li>Em Wattman, um <b>undervolt</b> leve (≈ −60 a −100 mV) reduz calor e mantém clocks estáveis.</li>
+        <li>Mantenha o driver estável (evite versões beta) e instale os <b>drivers de chipset AMD</b> (traz o plano de energia Ryzen).</li>
+      </ul></div>
+    <div class="card"><b>Dentro dos jogos</b>
+      <ul class="tips" style="margin-top:8px">
+        <li>Prefira <b>tela cheia exclusiva</b> e V-Sync desligado em jogos competitivos.</li>
+        <li>Limite o FPS ligeiramente abaixo do máximo estável para frametime constante.</li>
+        <li>Feche navegador, launchers e overlays inúteis enquanto joga.</li>
+      </ul></div>
+    <div class="card"><b>Expectativa realista</b>
+      <ul class="tips" style="margin-top:8px">
+        <li>Otimizações de Windows costumam dar ganhos pequenos de FPS, mas melhoram bastante <b>estabilidade, frametime e latência</b>.</li>
+        <li>Não incluímos desativar mitigações de CPU (Spectre): o ganho no Zen 1 é pequeno e reduz a segurança.</li>
+        <li>Se o jogo estiver instalado em HD, mova-o para um SSD: é a melhoria mais perceptível de todas.</li>
+      </ul></div>
+  </div>
+</section>
+
+<!-- MONITOR -->
+<section id="monitor">
+  <h1>Monitor ao vivo</h1><p class="sub">Uso de CPU, GPU, RAM e VRAM em tempo real. Deixe aberto no segundo monitor ou use Alt+Tab enquanto joga.</p>
+  <div class="mon">
+    <div class="mc"><div class="l">CPU</div><div class="v" id="mCpu">–<small>%</small></div><canvas id="cCpu"></canvas></div>
+    <div class="mc"><div class="l">Clock da CPU (estimado)</div><div class="v" id="mClk">–<small>MHz</small></div><canvas id="cClk"></canvas></div>
+    <div class="mc"><div class="l">GPU (3D)</div><div class="v" id="mGpu">–<small>%</small></div><canvas id="cGpu"></canvas></div>
+    <div class="mc"><div class="l">VRAM em uso</div><div class="v" id="mVram">–<small>MB</small></div><canvas id="cVram"></canvas></div>
+    <div class="mc"><div class="l">RAM em uso</div><div class="v" id="mRam">–<small>MB</small></div><canvas id="cRam"></canvas></div>
+  </div>
+  <div class="card" style="margin-top:14px"><b>Como ler</b>
+    <ul class="tips" style="margin-top:8px">
+      <li><b>GPU perto de 100% e CPU baixa:</b> a placa de vídeo é o limite (como no seu Mad Max). Baixar gráficos aumenta o FPS.</li>
+      <li><b>CPU alta e GPU baixa:</b> o processador é o limite (comum em jogos competitivos com FPS alto).</li>
+      <li>Temperatura e FPS dentro do jogo o Windows não informa a programas comuns: para isso use o overlay do <b>CapFrameX</b> ou do MSI Afterburner.</li>
+    </ul></div>
+</section>
+
+<!-- BENCHMARK -->
+<section id="bench">
+  <h1>Benchmark e Estresse</h1><p class="sub">Gera uma nota para comparar o PC <b>antes</b> e <b>depois</b> das otimizações. As notas são relativas: valem para comparar o mesmo PC com ele mesmo.</p>
+  <div class="card" style="margin-bottom:14px">
+    <div class="bar" style="margin-bottom:8px">
+      <input class="t" id="bLabel" value="Antes" placeholder="Nome do teste (ex.: Antes)" style="width:210px">
+      <button class="btn pri" id="bFull">▶ Benchmark completo (~1 min)</button>
+      <select id="sDur"><option value="30">Estresse 30 s</option><option value="60" selected>Estresse 1 min</option><option value="120">Estresse 2 min</option><option value="300">Estresse 5 min</option></select>
+      <button class="btn" id="bStress">🔥 Teste de estresse</button>
+      <button class="btn" id="bStop" disabled>■ Parar</button>
+    </div>
+    <p class="note" style="margin:0">Para uma comparação justa: reinicie o PC, feche navegador/launchers, use sempre o mesmo plano de energia e <b>não use o PC durante o teste</b>. Faça 2–3 rodadas e compare a média. <i>Mit/s</i> = milhões de operações por segundo.</p>
+  </div>
+  <div class="grid g2">
+    <div class="card"><div class="score"><div><div class="sub">NOTA GERAL</div><div class="tot" id="bTotal">–</div></div><div class="sub" id="bState">Pronto para testar.</div></div>
+      <div class="steps" id="bSteps"></div></div>
+    <div class="card"><div class="sub" style="margin-bottom:8px">TESTE DE GPU (WebGL)</div><canvas id="gpuCv" width="1280" height="720"></canvas><div class="note" id="gpuInfo">Roda junto com o benchmark e o estresse.</div></div>
+  </div>
+  <div class="card" id="stressCard" style="margin-top:14px;display:none"><b>Resultado do estresse</b><div id="stressOut"></div></div>
+  <h3 style="margin:22px 0 8px;color:var(--acc2);font-size:12px;letter-spacing:1px">HISTÓRICO E COMPARAÇÃO</h3>
+  <div id="hist"></div>
+  <div class="bar" style="margin-top:8px"><span class="note" style="margin:0">Comparar</span><select id="selA"></select><span class="note" style="margin:0">com</span><select id="selB"></select><button class="btn sm" id="doCmp">Comparar</button></div>
+  <div id="cmpOut" class="card" style="margin-top:10px;display:none"></div>
+</section>
+</main>
+
+<div class="ov" id="ov"><div class="modal">
+  <h2 id="mTitle">Trabalhando…</h2><div class="note" id="mSub"></div>
+  <div class="prog"><i id="mBar"></i></div>
+  <div class="log" id="mLog"></div>
+  <div style="text-align:right;margin-top:14px"><button class="btn pri" id="mClose" style="display:none">Fechar</button></div>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const TOKEN='__TOKEN__';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function api(p,body){
+  const r=await fetch(p,{method:body?'POST':'GET',headers:{'X-GB-Token':TOKEN,'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});
+  if(!r.ok) throw new Error('HTTP '+r.status); return r.json();
+}
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),3500)}
+const fmt=b=>b>=1073741824?(b/1073741824).toFixed(2)+' GB':b>=1048576?(b/1048576).toFixed(1)+' MB':b>=1024?(b/1024).toFixed(0)+' KB':b+' B';
+let busy=false;
+
+/* navegação */
+$$('.nav').forEach(b=>b.onclick=()=>{$$('.nav').forEach(x=>x.classList.toggle('on',x===b));$$('section').forEach(s=>s.classList.toggle('on',s.id===b.dataset.p));});
+setInterval(()=>api('/api/ping').catch(()=>{}),4000);document.addEventListener('visibilitychange',()=>api('/api/ping').catch(()=>{})); api('/api/ping').catch(()=>{});
+$('#exit').onclick=()=>{api('/api/exit',{}).finally(()=>{document.body.innerHTML='<div style="margin:auto;text-align:center"><h2>Pode fechar esta janela.</h2></div>';setTimeout(()=>window.close(),300)})};
+
+/* modal de progresso */
+const M={open(t,s){$('#mTitle').textContent=t;$('#mSub').textContent=s||'';$('#mLog').innerHTML='';$('#mBar').style.width='0';$('#mClose').style.display='none';$('#ov').classList.add('on')},
+  log(t,c){const d=document.createElement('div');d.className=c||'';d.textContent=t;$('#mLog').appendChild(d);$('#mLog').scrollTop=1e9},
+  pct(p){$('#mBar').style.width=Math.round(p)+'%'},
+  done(t){$('#mTitle').textContent=t;$('#mBar').style.width='100%';$('#mClose').style.display='';},
+};
+$('#mClose').onclick=()=>$('#ov').classList.remove('on');
+
+/* ===== OTIMIZAÇÕES ===== */
+let tweaks=[],sel=new Set(),cat='Todas';
+async function loadTweaks(){tweaks=await api('/api/tweaks');renderChips();renderTweaks();renderStats()}
+function renderStats(){
+  const ap=tweaks.filter(t=>t.applied).length;
+  $('#sTotal').textContent=tweaks.length;$('#sApplied').textContent=ap;
+  $('#sSafe').textContent=tweaks.filter(t=>t.risk==='seguro'&&!t.applied).length;
+  $('#sAdv').textContent=tweaks.filter(t=>t.risk!=='seguro').length;
+}
+function renderChips(){
+  const cats=['Todas',...new Set(tweaks.map(t=>t.cat))];
+  $('#chips').innerHTML=cats.map(c=>`<button class="chip ${c===cat?'on':''}" data-c="${esc(c)}">${esc(c)}${c==='Todas'?'':' ('+tweaks.filter(t=>t.cat===c).length+')'}</button>`).join('');
+  $$('#chips .chip').forEach(b=>b.onclick=()=>{cat=b.dataset.c;renderChips();renderTweaks()});
+}
+function stLabel(t){return t.applied?'<span class="st ok" id="st-'+t.id+'">✔ Aplicado</span>':'<span class="st" id="st-'+t.id+'">Não aplicado</span>'}
+function renderTweaks(){
+  const q=$('#q').value.trim().toLowerCase();
+  const list=tweaks.filter(t=>(cat==='Todas'||t.cat===cat)&&(!q||(t.name+' '+t.desc).toLowerCase().includes(q)));
+  let html='',last='';
+  for(const t of list){
+    if(t.cat!==last){html+=`<div class="cat">${esc(t.cat)}</div>`;last=t.cat}
+    html+=`<label class="tw ${sel.has(t.id)?'sel':''}" id="tw-${t.id}"><input type="checkbox" data-id="${t.id}" ${sel.has(t.id)?'checked':''}>
+      <div class="t"><div class="n">${esc(t.name)}<span class="tag ${t.risk}">${t.risk.toUpperCase()}</span>${t.reboot?'<span class="tag rb">REINICIAR</span>':''}${t.norevert?'<span class="tag nr">SEM DESFAZER</span>':''}</div>
+      <div class="d">${esc(t.desc)}</div></div>${stLabel(t)}</label>`;
+  }
+  $('#twList').innerHTML=html||'<p class="note">Nenhum ajuste encontrado.</p>';
+  $$('#twList input').forEach(i=>i.onchange=()=>{i.checked?sel.add(i.dataset.id):sel.delete(i.dataset.id);i.closest('.tw').classList.toggle('sel',i.checked)});
+}
+$('#q').oninput=renderTweaks;
+$('#selSafe').onclick=()=>{tweaks.filter(t=>t.risk==='seguro'&&!t.norevert).forEach(t=>sel.add(t.id));renderTweaks()};
+$('#selNone').onclick=()=>{sel.clear();renderTweaks()};
+function setSt(id,cls,txt){const e=$('#st-'+id);if(e){e.className='st '+cls;e.textContent=txt}}
+
+async function runTweaks(ids,mode,title){
+  const name=id=>(tweaks.find(t=>t.id===id)||{}).name||id;
+  let i=0,fail=0,reboot=false;
+  for(const id of ids){
+    const t=tweaks.find(x=>x.id===id); if(!t) continue;
+    M.log('• '+t.name); setSt(id,'run','Aplicando…');
+    try{
+      const r=(await api(mode==='apply'?'/api/apply':'/api/revert',{ids:[id]}))[0];
+      if(r.ok){ t.applied=mode==='apply'; setSt(id,t.applied?'ok':'', t.applied?'✔ Aplicado':'Não aplicado'); M.log('   '+r.msg,'ok'); if(t.reboot) reboot=true }
+      else { fail++; setSt(id,'err','Erro'); M.log('   '+r.msg,'err') }
+    }catch(e){fail++;setSt(id,'err','Erro');M.log('   '+e.message,'err');
+      if(/fetch|HTTP/.test(e.message)){M.log('Perda de conexão com o programa. Feche esta janela e abra o GamerBoost.exe de novo. Nada foi alterado a partir daqui.','err');break}}
+    M.pct(++i/ids.length*100);
+  }
+  return {fail,reboot};
+}
+async function bulk(mode){
+  if(busy) return; const ids=[...sel].filter(id=>{const t=tweaks.find(x=>x.id===id);return t&&(mode==='apply'?!t.applied:t.applied)});
+  if(!ids.length){toast(mode==='apply'?'Nada novo para aplicar na seleção.':'Nenhum ajuste aplicado na seleção.');return}
+  if(mode==='apply'&&ids.some(id=>tweaks.find(t=>t.id===id).norevert)&&!confirm('A seleção inclui remoção de apps, que não pode ser desfeita automaticamente. Continuar?')) return;
+  busy=true;M.open(mode==='apply'?'Aplicando ajustes':'Revertendo ajustes',ids.length+' item(ns)');
+  const r=await runTweaks(ids,mode); renderStats();
+  M.log(r.fail?`Concluído com ${r.fail} erro(s).`:'Concluído sem erros.',r.fail?'err':'ok');
+  if(r.reboot) M.log('Reinicie o PC para ativar todos os ajustes.','hd');
+  M.done('Pronto!'); busy=false;
+}
+$('#applySel').onclick=()=>bulk('apply'); $('#revSel').onclick=()=>bulk('revert');
+
+/* ===== RESTAURAÇÃO ===== */
+async function makeRestore(){
+  M.log('Criando ponto de restauração (pode levar até 1 minuto)…','hd');
+  try{const r=await api('/api/restore/create',{});M.log(r.msg,r.ok?'ok':'err');return r.ok}catch(e){M.log(e.message,'err');return false}
+}
+$('#rpCreate').onclick=async()=>{if(busy)return;busy=true;M.open('Ponto de restauração');M.pct(30);const ok=await makeRestore();M.done(ok?'Ponto criado!':'Falhou');busy=false};
+$('#rpOpen').onclick=()=>api('/api/restore/open',{}).catch(()=>{});
+$('#revAll').onclick=async()=>{
+  if(busy)return; const ids=tweaks.filter(t=>t.applied&&!t.norevert).map(t=>t.id);
+  if(!ids.length){toast('Nenhum ajuste reversível aplicado.');return}
+  if(!confirm('Reverter '+ids.length+' ajuste(s) para os valores originais?'))return;
+  busy=true;M.open('Revertendo tudo');const r=await runTweaks(ids,'revert');renderStats();renderTweaks();
+  M.log(r.fail?`Concluído com ${r.fail} erro(s).`:'Tudo revertido.',r.fail?'err':'ok');M.done('Pronto!');busy=false;
+};
+
+/* ===== UM CLIQUE ===== */
+$('#one').onclick=async()=>{
+  if(busy)return;
+  const bloat=$('#optBloat').checked, clean=$('#optClean').checked;
+  const ids=tweaks.filter(t=>t.risk==='seguro'&&!t.applied&&(bloat||!t.norevert)).map(t=>t.id);
+  if(!confirm('Vou criar um ponto de restauração e aplicar '+ids.length+' ajustes seguros'+(clean?' + limpeza':'')+'. Continuar?'))return;
+  busy=true;M.open('Otimizando seu PC','Não feche esta janela.');M.pct(2);
+  M.log('ETAPA 1 – Ponto de restauração','hd');
+  const ok=await makeRestore();
+  if(!ok&&!confirm('Não foi possível criar o ponto de restauração. Continuar mesmo assim?')){M.done('Cancelado');busy=false;return}
+  M.log('ETAPA 2 – Otimizações','hd');
+  const r=await runTweaks(ids,'apply');renderStats();
+  if(clean){
+    M.log('ETAPA 3 – Limpeza do sistema','hd');
+    try{
+      const items=await api('/api/clean/scan');
+      const res=await api('/api/clean/run',{ids:items.filter(i=>i.default).map(i=>i.id)});
+      const tot=res.reduce((a,x)=>a+x.freed,0);M.log('Espaço liberado: '+fmt(tot),'ok');
+    }catch(e){M.log('Limpeza: '+e.message,'err')}
+  }
+  M.log(r.fail?`Concluído com ${r.fail} aviso(s)/erro(s).`:'Tudo certo!',r.fail?'err':'ok');
+  M.log('Reinicie o PC para ativar todos os ajustes.','hd');
+  M.done('Otimização concluída!');busy=false;renderTweaks();
+};
+
+/* ===== LIMPEZA ===== */
+let cItems=[];
+$('#cScan').onclick=async()=>{
+  if(busy)return;$('#cScan').disabled=true;$('#cList').innerHTML='<p class="note">Analisando…</p>';
+  try{cItems=await api('/api/clean/scan');renderClean()}catch(e){toast(e.message)}$('#cScan').disabled=false;
+};
+function renderClean(){
+  $('#cList').innerHTML=cItems.map(i=>`<label class="cl"><input type="checkbox" data-id="${i.id}" ${i.default?'checked':''}>
+    <div class="t"><b>${esc(i.name)}</b><div class="note" style="margin:2px 0 0">${esc(i.desc)}</div></div>
+    <div class="sz">${i.special&&!i.bytes?'—':fmt(i.bytes)}</div></label>`).join('');
+  $$('#cList input').forEach(i=>i.onchange=sumClean);sumClean();$('#cRun').disabled=false;
+}
+function sumClean(){const ids=new Set($$('#cList input:checked').map(i=>i.dataset.id));$('#cTotal').textContent=fmt(cItems.filter(i=>ids.has(i.id)).reduce((a,i)=>a+i.bytes,0))}
+$('#cRun').onclick=async()=>{
+  if(busy)return;const ids=$$('#cList input:checked').map(i=>i.dataset.id);if(!ids.length)return;
+  busy=true;M.open('Limpando…',ids.length+' item(ns)');M.pct(15);
+  try{const res=await api('/api/clean/run',{ids});let tot=0;
+    for(const r of res){tot+=r.freed;M.log((cItems.find(i=>i.id===r.id)||{}).name+' → '+fmt(r.freed),r.msg==='limpo'?'ok':'err')}
+    M.log('Total liberado: '+fmt(tot),'hd');M.done('Limpeza concluída!');
+  }catch(e){M.log(e.message,'err');M.done('Erro')}
+  busy=false;$('#cScan').click();
+};
+
+/* ===== SCANNER ===== */
+const kv=(k,v)=>`<div class="kv"><span>${esc(k)}</span><b>${esc(v)}</b></div>`;
+const arr=x=>x==null?[]:Array.isArray(x)?x:[x];
+$('#doScan').onclick=async()=>{
+  if(busy)return;$('#doScan').disabled=true;$('#scanMsg').textContent='Lendo hardware… (até 30 s)';
+  try{const d=await api('/api/scan');if(d.error)throw new Error(d.error);renderScan(d);$('#scanMsg').textContent='Concluído.'}
+  catch(e){$('#scanMsg').textContent='Erro: '+e.message}$('#doScan').disabled=false;
+};
+function renderScan(d){
+  const eff=m=>{const v=m.Configured||m.Speed||0;return(m.Type==26&&v>0&&v<=1800)?v*2:v};
+  const c=d.CPU||{},gp=arr(d.GPUs),mods=arr(d.RAM&&d.RAM.Modules).map(m=>({...m,Eff:eff(m)})),ds=arr(d.Disks),vs=arr(d.Volumes),nw=arr(d.Network),os=d.OS||{},bd=d.Board||{};
+  const gpu=gp.find(g=>/radeon|rx|nvidia|geforce|intel/i.test(g.Name))||gp[0]||{};
+  let h='<div class="grid g2">';
+  h+=`<div class="card sc"><h3>Processador</h3>${kv('Modelo',c.Name)}${kv('Núcleos / Threads',c.Cores+' / '+c.Threads)}${kv('Clock máx.',(c.MaxMHz/1000).toFixed(2)+' GHz')}${kv('Cache L2 / L3',(c.L2KB/1024).toFixed(1)+' MB / '+(c.L3KB/1024).toFixed(0)+' MB')}${kv('Soquete',c.Socket)}</div>`;
+  h+=`<div class="card sc"><h3>Placa de vídeo</h3>${gp.map(g=>kv('Modelo',g.Name)+kv('Memória de vídeo',g.VRAMMB?(g.VRAMMB/1024).toFixed(0)+' GB':'?')+kv('Driver',g.Driver+(g.DriverDate?' ('+g.DriverDate+')':''))+kv('Resolução / Hz',g.Resolution+' @ '+g.Hz+' Hz')).join('<hr style="border:0;border-top:1px solid #262c39;margin:6px 0">')}</div>`;
+  h+=`<div class="card sc"><h3>Memória RAM</h3>${kv('Total',(d.RAM.TotalGB||0)+' GB')}${kv('Livre agora',(d.RAM.FreeGB||0)+' GB')}${kv('Slots usados',mods.length+' de '+(d.RAM.Slots||'?'))}${mods.map(m=>kv(m.Slot,m.GB+' GB · '+m.Eff+' MT/s (DDR4) · '+(m.Maker||'')+' '+(m.Part||''))).join('')}</div>`;
+  h+=`<div class="card sc"><h3>Placa-mãe e BIOS</h3>${kv('Placa-mãe',(bd.Maker||'')+' '+(bd.Model||''))}${kv('BIOS',bd.BIOS)}${kv('Data da BIOS',bd.BIOSDate)}<h3 style="margin-top:12px">Sistema</h3>${kv('Windows',os.Name)}${kv('Versão / Build',os.Version+' / '+os.Build)}${kv('Ligado há',os.UptimeH+' h')}${kv('Plano de energia',d.PowerPlan)}</div>`;
+  h+=`<div class="card sc"><h3>Armazenamento</h3>${ds.map(x=>kv(x.Name,x.SizeGB+' GB · '+x.Type+' · '+x.Bus+' · '+x.Health)).join('')}${vs.map(v=>kv('Unidade '+v.Letter+': '+(v.Label||''),v.FreeGB+' GB livres de '+v.SizeGB+' GB')).join('')}</div>`;
+  h+=`<div class="card sc"><h3>Rede e processos</h3>${nw.map(n=>kv(n.Name,n.Speed)).join('')||kv('Rede','–')}${kv('Programas na inicialização',d.Startup)}${kv('Processos em execução',d.Processes)}</div>`;
+  h+='</div><h3 style="margin:18px 0 8px;color:var(--acc2);font-size:12px;letter-spacing:1px">RECOMENDAÇÕES PARA O SEU PC</h3>';
+  const R=[];
+  if(mods.length===1) R.push(['bad','Você usa apenas 1 pente de RAM: o Ryzen perde muito desempenho em single channel. Use 2 pentes (dual channel).']);
+  else if(mods.length>=2) R.push(['good','RAM em dual channel ('+mods.length+' pentes). Ótimo para o Ryzen.']);
+  const sp=Math.max(0,...mods.map(m=>m.Eff||0));
+  if(sp&&sp<2933) R.push(['bad','Sua RAM roda a '+sp+' MT/s. Ative o XMP/DOCP na BIOS para 3000–3200 MT/s: é o ganho mais importante em Ryzen de 1ª geração.']);
+  else if(sp) R.push(['good','RAM a '+sp+' MT/s (XMP/DOCP ativo). Boa velocidade para o Ryzen 5 1600.']);
+  if(gpu.VRAMMB&&gpu.VRAMMB<4000&&/580/.test(gpu.Name||'')) R.push(['warn','A RX 580 tem versões de 4 GB e 8 GB; abaixe texturas se o jogo usar mais VRAM do que a placa tem.']);
+  if(gpu.Hz&&gpu.Hz<=60) R.push(['warn','Seu monitor está a '+gpu.Hz+' Hz. Confira em Configurações > Tela > Taxa de atualização se ele suporta mais.']);
+  const sys=ds.find(x=>/hdd|unspecified/i.test(x.Type));
+  if(sys&&!ds.some(x=>/ssd/i.test(x.Type))) R.push(['bad','Nenhum SSD detectado. Instalar os jogos em um SSD é a melhoria mais perceptível possível.']);
+  else if(ds.some(x=>/ssd/i.test(x.Type))) R.push(['good','SSD detectado. Mantenha os jogos nele.']);
+  vs.forEach(v=>{if(v.SizeGB&&v.FreeGB/v.SizeGB<.15) R.push(['bad','Unidade '+v.Letter+': com menos de 15% livre. Use a Limpeza e libere espaço.'])});
+  if(d.Startup>10) R.push(['warn','Há '+d.Startup+' programas na inicialização. Desative os desnecessários no Gerenciador de Tarefas.']);
+  if(os.UptimeH>72) R.push(['warn','O PC está ligado há '+os.UptimeH+' h. Reinicie para liberar memória e aplicar ajustes.']);
+  if(!/desempenho|ultimate|high/i.test(d.PowerPlan||'')) R.push(['warn','Plano de energia atual: '+d.PowerPlan+'. Aplique “Plano de energia Desempenho Máximo”.']);
+  if(!/win/i.test(os.Name||'')) {}
+  h+=R.map(([c,t])=>`<div class="rec ${c==='good'?'good':c==='bad'?'bad':''}">${c==='good'?'✅':c==='bad'?'⚠️':'ℹ️'} <div>${esc(t)}</div></div>`).join('');
+  $('#scanOut').innerHTML=h;
+}
+
+/* ===== MONITOR ===== */
+const hist={cpu:[],clk:[],gpu:[],vram:[],ram:[]};let monT=null;
+function spark(id,arr,max,color){
+  const c=$('#'+id);if(!c)return;const w=c.width=c.clientWidth*2,hh=c.height=c.clientHeight*2,x=c.getContext('2d');
+  x.clearRect(0,0,w,hh);if(arr.length<2)return;const m=max||Math.max(1,...arr);
+  x.beginPath();arr.forEach((v,i)=>{const px=i/(59)*w,py=hh-(Math.min(v,m)/m)*(hh-4)-2;i?x.lineTo(px,py):x.moveTo(px,py)});
+  x.strokeStyle=color;x.lineWidth=3;x.stroke();x.lineTo(w,hh);x.lineTo(0,hh);x.closePath();x.fillStyle=color+'22';x.fill();
+}
+function push(k,v){hist[k].push(+v||0);if(hist[k].length>60)hist[k].shift()}
+async function monTick(){
+  try{const d=await api('/api/monitor');if(d.waiting||d.error)return;
+    push('cpu',d.cpu);push('clk',d.clock||0);push('gpu',d.gpu);push('vram',d.vram);push('ram',d.ramUsed);
+    $('#mCpu').innerHTML=d.cpu+'<small>%</small>';$('#mClk').innerHTML=(d.clock||'–')+'<small>MHz</small>';
+    $('#mGpu').innerHTML=d.gpu+'<small>%</small>';$('#mVram').innerHTML=d.vram+'<small>MB</small>';
+    $('#mRam').innerHTML=d.ramUsed+'<small>/ '+d.ramTotal+' MB</small>';
+    spark('cCpu',hist.cpu,100,'#2fd27a');spark('cClk',hist.clk,0,'#9aa6ff');spark('cGpu',hist.gpu,100,'#ff5c3d');
+    spark('cVram',hist.vram,0,'#ffc233');spark('cRam',hist.ram,d.ramTotal,'#4db3ff');
+  }catch(e){}
+}
+function monCtl(){const on=$('#monitor').classList.contains('on')||busyBench;
+  if(on&&!monT){monTick();monT=setInterval(monTick,1000)}else if(!on&&monT){clearInterval(monT);monT=null}}
+$$('.nav').forEach(b=>b.addEventListener('click',()=>setTimeout(monCtl,0)));
+
+/* ===== BENCHMARK ===== */
+let busyBench=false,gpuStop=false;
+const S=(id,name)=>`<div class="s" id="bs-${id}"><span>${name}</span><b>–</b></div>`;
+function setStep(id,txt,run){const e=$('#bs-'+id+' b');if(e){e.textContent=txt;e.parentElement.classList.toggle('run',!!run)}}
+function benchUI(on){busyBench=on;['bFull','bStress'].forEach(i=>$('#'+i).disabled=on);$('#bStop').disabled=!on;monCtl()}
+$('#bStop').onclick=()=>{gpuStop=true;api('/api/bench/stop',{}).catch(()=>{})};
+
+function gpuTest(seconds){
+  return new Promise(resolve=>{
+    const cv=$('#gpuCv');const gl=cv.getContext('webgl2',{antialias:false,powerPreference:'high-performance',preserveDrawingBuffer:true});
+    if(!gl){resolve({error:'WebGL2 indisponível neste navegador'});return}
+    const LOOP=window.GPU_LOOP||56;
+    const vs='#version 300 es\nin vec2 p;void main(){gl_Position=vec4(p,0,1);}';
+    const fs=`#version 300 es
+precision highp float;uniform float t;uniform vec2 r;out vec4 o;
+float h(vec3 p){return fract(sin(dot(p,vec3(12.9898,78.233,37.719)))*43758.5453);}
+float n(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+ return mix(mix(mix(h(i),h(i+vec3(1,0,0)),f.x),mix(h(i+vec3(0,1,0)),h(i+vec3(1,1,0)),f.x),f.y),
+            mix(mix(h(i+vec3(0,0,1)),h(i+vec3(1,0,1)),f.x),mix(h(i+vec3(0,1,1)),h(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float fbm(vec3 p){float a=.5,s=0.;for(int i=0;i<6;i++){s+=a*n(p);p*=2.02;a*=.5;}return s;}
+void main(){vec2 uv=(gl_FragCoord.xy-.5*r)/r.y;vec3 ro=vec3(0,0,t*.3),rd=normalize(vec3(uv,1.2));
+ vec3 c=vec3(0);float tt=0.;for(int i=0;i<${LOOP};i++){vec3 q=ro+rd*tt;float d=fbm(q*1.5+vec3(0,t*.1,0));c+=vec3(d*d,d*.6,.2+d)*.02;tt+=.05;}
+ o=vec4(c,1);}`;
+    function sh(t,s){const x=gl.createShader(t);gl.shaderSource(x,s);gl.compileShader(x);if(!gl.getShaderParameter(x,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(x));return x}
+    let pr;try{pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,vs));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pr);gl.useProgram(pr)}catch(e){resolve({error:'shader: '+e.message});return}
+    const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+    const loc=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+    gl.viewport(0,0,cv.width,cv.height);gl.uniform2f(gl.getUniformLocation(pr,'r'),cv.width,cv.height);
+    const ut=gl.getUniformLocation(pr,'t'),px=new Uint8Array(4);
+    const times=[],stamps=[];const t0=performance.now(),end=t0+seconds*1000;let warm=8;
+    function frame(){
+      const a=performance.now();gl.uniform1f(ut,(a-t0)/1000);gl.drawArrays(gl.TRIANGLES,0,3);gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);
+      const e=performance.now();
+      if(warm>0)warm--;else{times.push(e-a);stamps.push(e-t0)}
+      if(e<end&&!gpuStop)setTimeout(frame,0);else fin();
+    }
+    function fin(){
+      if(times.length<5){resolve({error:'poucos quadros medidos'});return}
+      const sorted=[...times].sort((x,y)=>x-y),avg=times.reduce((x,y)=>x+y,0)/times.length;
+      const p99=sorted[Math.floor((sorted.length-1)*.99)];
+      const fps=1000/avg,low=1000/p99;
+      // vazão por segundo
+      const per=[];let k=0;for(let s=1;s<=Math.floor(stamps[stamps.length-1]/1000);s++){let c=0;while(k<stamps.length&&stamps[k]<s*1000){c++;k++}per.push(c)}
+      resolve({avg_fps:+fps.toFixed(1),low1_fps:+low.toFixed(1),frames:times.length,avg_ms:+avg.toFixed(2),per_second:per,
+        points:Math.round((0.7*fps+0.3*low)*40),stopped:gpuStop});
+    }
+    frame();
+  });
+}
+const GM=a=>Math.round(Math.exp(a.reduce((x,y)=>x+Math.log(Math.max(1,y)),0)/a.length));
+
+$('#bFull').onclick=async()=>{
+  if(busy||busyBench)return;
+  if(!confirm('O teste usa 100% da CPU e da GPU por cerca de 1 minuto. Feche outros programas e não mexa no PC. Começar?'))return;
+  benchUI(true);gpuStop=false;$('#stressCard').style.display='none';$('#bTotal').textContent='…';
+  $('#bSteps').innerHTML=S('single','CPU – 1 núcleo')+S('multi','CPU – todos os núcleos')+S('ram','Memória RAM')+S('latency','Latência do sistema')+S('gpu','GPU (WebGL)');
+  const data={};let ok=true;
+  const run=async(id,test,fmtr)=>{setStep(id,'testando…',true);$('#bState').textContent='Testando: '+id+'…';
+    const r=await api('/api/bench/run?test='+test,{});data[id]=r;setStep(id,fmtr(r));return r};
+  try{
+    await run('single','single',r=>r.points+' pts · '+r.mits+' Mit/s');
+    if(!gpuStop)await run('multi','multi',r=>r.points+' pts · '+r.mits+' Mit/s');
+    if(!gpuStop)await run('ram','ram',r=>r.points+' pts · '+r.gbs+' GB/s · '+r.latency_ns+' ns');
+    if(!gpuStop)await run('latency','latency',r=>r.points+' pts · perda '+r.lost_pct+'% · pico '+r.max_us+' µs');
+    if(!gpuStop){setStep('gpu','testando…',true);$('#bState').textContent='Testando a GPU…';
+      const g=await gpuTest(15);data.gpu=g;
+      setStep('gpu',g.error?('erro: '+g.error):(g.points+' pts · '+g.avg_fps+' FPS · 1% low '+g.low1_fps))}
+  }catch(e){ok=false;$('#bState').textContent='Erro: '+e.message}
+  if(gpuStop||!ok){benchUI(false);if(ok)$('#bState').textContent='Interrompido.';$('#bTotal').textContent='–';return}
+  const pts=['single','multi','ram','latency','gpu'].map(k=>data[k]&&data[k].points).filter(v=>v>0);
+  data.total=GM(pts);data.partial=pts.length<5;
+  $('#bTotal').textContent=data.total;$('#bState').textContent=data.partial?'Concluído (sem teste de GPU: nota parcial).':'Concluído e salvo no histórico.';
+  try{await api('/api/results/save',{label:$('#bLabel').value||'Teste',data})}catch(e){}
+  benchUI(false);loadHist();
+};
+
+function verdict(drop,stab){
+  if(drop<3&&stab>90)return['up','Estável: sem queda ao longo do teste. Bom sinal de refrigeração e energia.'];
+  if(drop<8)return['eq','Queda leve de desempenho. Verifique a temperatura e a poeira no cooler.'];
+  return['dn','Queda grande: provável superaquecimento ou limite de energia. Revise o cooler, a pasta térmica e o fluxo de ar.'];
+}
+$('#bStress').onclick=async()=>{
+  if(busy||busyBench)return;const sec=+$('#sDur').value;
+  if(!confirm('O estresse deixa CPU e GPU em 100% por '+sec+' s. Acompanhe a temperatura (ex.: pelo Monitor ou HWiNFO) e use o botão Parar se esquentar demais. Começar?'))return;
+  benchUI(true);gpuStop=false;$('#bTotal').textContent='…';$('#bSteps').innerHTML='';$('#bState').textContent='Estressando CPU + GPU por '+sec+' s…';
+  $('#stressCard').style.display='none';
+  const gp=gpuTest(sec);let cpu;
+  try{cpu=await api('/api/bench/stress?seconds='+sec,{})}catch(e){cpu={error:e.message}}
+  gpuStop=true;const g=await gp;gpuStop=false;
+  let h='';
+  if(cpu.error){h+='<p class="dn">Erro na CPU: '+esc(cpu.error)+'</p>'}
+  else{const v=verdict(cpu.drop_pct,cpu.stability_pct);
+    h+=`<div class="kv"><span>CPU – média</span><b>${cpu.avg_mits} Mit/s</b></div><div class="kv"><span>CPU – pior segundo</span><b>${cpu.min_mits} Mit/s</b></div>
+        <div class="kv"><span>CPU – queda do início ao fim</span><b>${cpu.drop_pct}%</b></div><div class="kv"><span>CPU – estabilidade</span><b>${cpu.stability_pct}%</b></div>
+        <p class="${v[0]}" style="margin:8px 0">${v[1]}</p>`}
+  if(g&&!g.error){const gd=g.per_second.length>4?(()=>{const k=Math.max(1,Math.floor(g.per_second.length/5)),a=g.per_second.slice(0,k).reduce((x,y)=>x+y,0)/k,b=g.per_second.slice(-k).reduce((x,y)=>x+y,0)/k;return Math.max(0,(a-b)/a*100)})():0;
+    const v=verdict(gd,100-gd);
+    h+=`<div class="kv"><span>GPU – FPS médio</span><b>${g.avg_fps}</b></div><div class="kv"><span>GPU – 1% low</span><b>${g.low1_fps}</b></div>
+        <div class="kv"><span>GPU – queda do início ao fim</span><b>${gd.toFixed(1)}%</b></div><p class="${v[0]}" style="margin:8px 0">${v[1]}</p>`}
+  else if(g)h+='<p class="dn">GPU: '+esc(g.error)+'</p>';
+  h+='<p class="note">Observação: o Windows não informa temperatura a programas comuns. Estas conclusões vêm da queda de desempenho ao longo do tempo.</p>';
+  $('#stressOut').innerHTML=h;$('#stressCard').style.display='';
+  $('#bTotal').textContent='–';$('#bState').textContent='Estresse concluído. Veja o resultado abaixo (não gera nota geral).';
+  benchUI(false);
+};
+
+/* histórico e comparação */
+let runs=[];
+async function loadHist(){
+  try{runs=await api('/api/results')}catch(e){return}
+  const full=runs.filter(r=>r.data&&r.data.total);
+  $('#hist').innerHTML=full.slice().reverse().map(r=>`<div class="hist"><div class="t"><b>${esc(r.label)}</b> <small>${esc(r.time)}</small></div>
+    <div><b>${r.data.total}</b> <small>pts</small></div><button class="btn sm" data-del="${r.id}">Excluir</button></div>`).join('')||'<p class="note">Nenhum teste salvo ainda. Rode o benchmark completo.</p>';
+  $$('#hist [data-del]').forEach(b=>b.onclick=async()=>{await api('/api/results/delete',{id:+b.dataset.del});loadHist()});
+  const opts=full.map(r=>`<option value="${r.id}">${esc(r.label)} – ${esc(r.time)} (${r.data.total})</option>`).join('');
+  $('#selA').innerHTML=opts;$('#selB').innerHTML=opts;if(full.length>1){$('#selA').selectedIndex=0;$('#selB').selectedIndex=full.length-1}
+}
+const METRICS=[
+  ['Nota geral',d=>d.total,1],['CPU – 1 núcleo (pts)',d=>d.single&&d.single.points,1],['CPU – todos os núcleos (pts)',d=>d.multi&&d.multi.points,1],
+  ['RAM – banda (GB/s)',d=>d.ram&&d.ram.gbs,1],['RAM – latência (ns)',d=>d.ram&&d.ram.latency_ns,-1],
+  ['Latência do sistema (pts)',d=>d.latency&&d.latency.points,1],['Tempo perdido em travadinhas (%)',d=>d.latency&&d.latency.lost_pct,-1],
+  ['Maior travadinha (µs)',d=>d.latency&&d.latency.max_us,-1],['GPU – FPS médio',d=>d.gpu&&d.gpu.avg_fps,1],['GPU – 1% low',d=>d.gpu&&d.gpu.low1_fps,1],['GPU (pts)',d=>d.gpu&&d.gpu.points,1]];
+$('#doCmp').onclick=()=>{
+  const a=runs.find(r=>r.id==$('#selA').value),b=runs.find(r=>r.id==$('#selB').value);if(!a||!b){toast('Selecione dois testes.');return}
+  let h=`<table class="cmp"><tr><th>Métrica</th><th>${esc(a.label)}</th><th>${esc(b.label)}</th><th>Diferença</th></tr>`;
+  for(const [n,f,dir] of METRICS){const x=f(a.data),y=f(b.data);if(x==null||y==null||x===undefined)continue;
+    const pct=x?((y-x)/x*100):0;const good=dir>0?pct>0:pct<0;const cls=Math.abs(pct)<1?'eq':good?'up':'dn';
+    h+=`<tr><td>${esc(n)}</td><td>${x}</td><td>${y}</td><td class="${cls}">${pct>0?'+':''}${pct.toFixed(1)}%</td></tr>`}
+  h+='</table><p class="note">Verde = melhorou · vermelho = piorou. Diferenças abaixo de ~2–3% entre rodadas estão dentro da variação normal.</p>';
+  $('#cmpOut').innerHTML=h;$('#cmpOut').style.display='';
+};
+loadHist();
+
+/* ===== ATUALIZAÇÃO ===== */
+async function checkUpd(manual){
+  try{const d=await api('/api/update/check');$('#ver').textContent='v'+d.current;
+    if(d.newer){$('#updTxt').textContent='Nova versão disponível: v'+d.latest+' (você está na v'+d.current+')';$('#updBar').style.display='';}
+    else{$('#updBar').style.display='none';if(manual)toast(d.error?('Não foi possível verificar: '+d.error):'Você já está na versão mais recente (v'+d.current+').')}
+  }catch(e){if(manual)toast('Não foi possível verificar: '+e.message)}
+}
+$('#chkUpd').onclick=()=>checkUpd(true);
+$('#updGo').onclick=async()=>{
+  if(busy||busyBench)return;
+  if(!confirm('Baixar e instalar a nova versão? O programa vai reiniciar. Seus ajustes aplicados e o histórico de benchmarks são mantidos.'))return;
+  busy=true;M.open('Atualizando…','Baixando e verificando o arquivo.');M.pct(30);
+  try{const r=await api('/api/update/apply',{});M.log(r.msg,r.ok?'ok':'err');
+    if(r.ok&&r.restart){M.log('Uma nova janela vai abrir. Pode fechar esta.','hd');M.done('Atualizado!')}else M.done(r.ok?'Pronto':'Falhou')}
+  catch(e){M.log('O programa reiniciou ou perdeu a conexão. Se uma nova janela abriu, pode fechar esta.','hd');M.done('Verifique a nova janela')}
+  busy=false;
+};
+setTimeout(()=>checkUpd(false),1500);
+
+loadTweaks().catch(e=>toast('Erro ao carregar: '+e.message));
+</script>
+</body>
+</html>
